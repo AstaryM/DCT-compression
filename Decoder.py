@@ -25,10 +25,7 @@ def decoder(image_file_name):
                     result_image[block_row_start: block_row_end, block_column_start: block_column_end,
                     channel] = decode_block(block)
         cv2.cvtColor(src=result_image, dst=result_image, code=INVERSE_IMAGE_FORMAT)
-        cv2.imshow("temp", result_image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
+        return result_image
 
 def decode_block(block):
     quantization_table = QUANTIZATION_TABLE

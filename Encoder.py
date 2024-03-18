@@ -2,8 +2,16 @@ import numpy as np
 
 from utils import *
 
+import numpy as np
 
-def encode_image(image, length, width, file_name):
+from utils import *
+
+
+def encoder(image, file_name):
+    temp_length, temp_width = image.shape[:2]
+    result = cv2.copyMakeBorder(image, 0, BLOCK_LENGTH - (temp_length % BLOCK_LENGTH), 0,
+                                BLOCK_LENGTH - (temp_width % BLOCK_LENGTH), cv2.BORDER_REPLICATE)
+    length, width = result.shape[:2]
     cv2.cvtColor(src=image, dst=image, code=IMAGE_FORMAT)
 
     result_image = np.empty((length, width, CHANNELS), dtype=INTEGER_DTYPE_SIGNED)
@@ -63,17 +71,22 @@ def zigzager(block):
 
 def RLE_to_file(image, length, width, file_name):
     counter = 1
-    with open(file_name, "wb") as file:
-
-        file.write(length.to_bytes(2, byteorder="little"))
-        file.write(width.to_bytes(2, byteorder="little"))
-        image = image.flatten()
-        for i in range(image.shape[0]):
-            if i < image.shape[0] - 1 and image[i] == image[i + 1]:
-                counter += 1
-            else:
-                file.write(image[i])
-                if counter > 1:
-                    file.write(image[i])
-                    file.write(counter.to_bytes(2, byteorder="little"))
-                counter = 1
+    pos = 4
+    # with open(file_name, "wb") as file:
+    result = np.empty(length * width)
+    result[0:2] = length.to_bytes(2, byteorder="little")
+    result[2:4] = width.to_bytes(2, byteorder="little")
+    image = image.flatten()
+    for i in range(image.shape[0]):
+        if i < image.shape[0] - 1 and image[i] == image[i + 1]:
+            counter += 1
+        else:
+            result[pos] = image[i]
+            pos += 1
+            if counter > 1:
+                result[pos] = image[i]
+                pos += 1
+                result[pos:pos + 2] = counter.to_bytes(2, byteorder="little")
+                pos += 2
+            counter = 1
+    return result
