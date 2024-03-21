@@ -11,20 +11,20 @@ def encode(image_path):
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     encoded_image = Encoder.encoder(image)
     with open(encoded_file_name, "w") as encoded_file:
-        cv2.imwrite(encoded_file_name, encoded_image)
-        old_size = os.path.getsize(encoded_file_name)
-        new_size = os.path.getsize(image_path)
+        encoded_image.tofile(encoded_file_name)
+        old_size = os.path.getsize(image_path)
+        new_size = os.path.getsize(encoded_file_name)
         print(f"compression process ended, new file size is {np.float16(100 * new_size / old_size)}% of the old file size")
 
 
 def decode(image_path):
     decoded_file_name = os.path.splitext(image_path)[0] + '.tsa'
-    encoded_image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    encoded_image= np.fromfile(image_path, dtype=INTEGER_DTYPE_UNSIGNED)
     decoded_image = Decoder.decoder(encoded_image)
-    cv2.imwrite(decoded_file_name, decoded_image)
-    # cv2.imshow("temp", result_image)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    decoded_image.tofile(decoded_file_name)
+    cv2.imshow("temp", decoded_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':

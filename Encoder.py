@@ -93,4 +93,4 @@ def get_RLE(image, length, width):
                 result[pos:pos + 2] = bytearray(counter.to_bytes(2, byteorder="little"))
                 pos += 2
             counter = 1
-    return result
+    return result[0: pos]
