@@ -1,9 +1,3 @@
-import numpy as np
-
-from utils import *
-
-import numpy as np
-
 from utils import *
 
 
@@ -35,10 +29,7 @@ def encoder(image):
 
 def encode_block(block):
     quantization_table = QUANTIZATION_TABLE
-    try:
-        processed_block = cv2.dct(np.asarray(block, dtype=FLOAT_DTYPE) / SCALE) * SCALE
-    except:
-        pass
+    processed_block = cv2.dct(np.asarray(block, dtype=FLOAT_DTYPE) / SCALE) * SCALE
     processed_block = np.divide(processed_block, quantization_table)
     processed_block = np.asarray(processed_block, dtype=INTEGER_DTYPE_SIGNED)
     processed_block = zigzager(processed_block)
