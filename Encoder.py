@@ -7,7 +7,7 @@ import numpy as np
 from utils import *
 
 
-def encoder(image, file_name):
+def encoder(image):
     temp_length, temp_width = image.shape[:2]
     result = cv2.copyMakeBorder(image, 0, BLOCK_LENGTH - (temp_length % BLOCK_LENGTH), 0,
                                 BLOCK_LENGTH - (temp_width % BLOCK_LENGTH), cv2.BORDER_REPLICATE)
@@ -16,25 +16,29 @@ def encoder(image, file_name):
 
     result_image = np.empty((length, width, CHANNELS), dtype=INTEGER_DTYPE_SIGNED)
     for channel in range(CHANNELS):
-        for i in range(int(length / BLOCK_LENGTH)):
+        for i in range(int(length / BLOCK_LENGTH) - 1):
 
             block_row_start = i * BLOCK_LENGTH
             block_row_end = i * BLOCK_LENGTH + BLOCK_LENGTH
 
-            for j in range(int(width / BLOCK_LENGTH)):
+            for j in range(int(width / BLOCK_LENGTH) - 1):
                 block_column_start = j * BLOCK_LENGTH
                 block_column_end = j * BLOCK_LENGTH + BLOCK_LENGTH
-
+                if block_column_end == 1928:
+                    pass
                 block = image[block_row_start: block_row_end, block_column_start: block_column_end, channel]
                 result_image[block_row_start: block_row_end, block_column_start: block_column_end,
                 channel] = encode_block(
                     block)
-    RLE_to_file(result_image, length, width, file_name)
+    return get_RLE(result_image, length, width)
 
 
 def encode_block(block):
     quantization_table = QUANTIZATION_TABLE
-    processed_block = cv2.dct(np.asarray(block, dtype=FLOAT_DTYPE) / SCALE) * SCALE
+    try:
+        processed_block = cv2.dct(np.asarray(block, dtype=FLOAT_DTYPE) / SCALE) * SCALE
+    except:
+        pass
     processed_block = np.divide(processed_block, quantization_table)
     processed_block = np.asarray(processed_block, dtype=INTEGER_DTYPE_SIGNED)
     processed_block = zigzager(processed_block)
@@ -69,13 +73,13 @@ def zigzager(block):
     return result
 
 
-def RLE_to_file(image, length, width, file_name):
+def get_RLE(image, length, width):
     counter = 1
     pos = 4
     # with open(file_name, "wb") as file:
-    result = np.empty(length * width)
-    result[0:2] = length.to_bytes(2, byteorder="little")
-    result[2:4] = width.to_bytes(2, byteorder="little")
+    result = np.empty(length * width, dtype=INTEGER_DTYPE_UNSIGNED)
+    result[0:2] = bytearray(length.to_bytes(2, byteorder="little"))
+    result[2:4] = bytearray(width.to_bytes(2, byteorder="little"))
     image = image.flatten()
     for i in range(image.shape[0]):
         if i < image.shape[0] - 1 and image[i] == image[i + 1]:
@@ -86,7 +90,7 @@ def RLE_to_file(image, length, width, file_name):
             if counter > 1:
                 result[pos] = image[i]
                 pos += 1
-                result[pos:pos + 2] = counter.to_bytes(2, byteorder="little")
+                result[pos:pos + 2] = bytearray(counter.to_bytes(2, byteorder="little"))
                 pos += 2
             counter = 1
     return result

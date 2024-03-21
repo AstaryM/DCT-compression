@@ -1,17 +1,15 @@
 from utils import *
 
 
-def decoder(image_file_name):
-    with open(image_file_name, 'rb') as compressed_file:
-        image_data = compressed_file.read()
+def decoder(encoded_image):
 
-        length = image_data[0] + image_data[1] * SECOND_BYTE_COEFFICIENT
-        width = image_data[2] + image_data[3] * SECOND_BYTE_COEFFICIENT
+        length = encoded_image[0] + encoded_image[1] * SECOND_BYTE_COEFFICIENT
+        width = encoded_image[2] + encoded_image[3] * SECOND_BYTE_COEFFICIENT
 
-        image_data = image_data[4:]
+        encoded_image = encoded_image[4:]
 
         result_image = np.empty((length, width, CHANNELS), dtype=INTEGER_DTYPE_UNSIGNED)
-        encoded_image = anti_RLE(image_data, length, width)
+        encoded_image = anti_RLE(encoded_image, length, width)
         for channel in range(CHANNELS):
             for i in range(int(length / BLOCK_LENGTH)):
                 block_row_start = i * BLOCK_LENGTH
