@@ -4,23 +4,17 @@ from utils import *
 def decoder(encoded_image) -> np.ndarray:
     length = encoded_image[0] + encoded_image[1] * SECOND_BYTE_COEFFICIENT
     width = encoded_image[2] + encoded_image[3] * SECOND_BYTE_COEFFICIENT
-
     encoded_image = encoded_image[4:]
-
     result_image = np.empty((length, width, CHANNELS), dtype=INTEGER_DTYPE_UNSIGNED)
     encoded_image = anti_RLE(encoded_image, length, width)
     for channel in range(CHANNELS):
-        for i in range(int(length / BLOCK_LENGTH)):
-            block_row_start = i * BLOCK_LENGTH
-            block_row_end = i * BLOCK_LENGTH + BLOCK_LENGTH
+        for i in range(0, length, BLOCK_LENGTH):
 
-            for j in range(int(width / BLOCK_LENGTH)):
-                block_column_start = j * BLOCK_LENGTH
-                block_column_end = j * BLOCK_LENGTH + BLOCK_LENGTH
-
-                block = encoded_image[block_row_start: block_row_end, block_column_start: block_column_end, channel]
-                result_image[block_row_start: block_row_end, block_column_start: block_column_end,
+            for j in range(0, width, BLOCK_LENGTH):
+                block = encoded_image[i: i + BLOCK_LENGTH, j: j + BLOCK_LENGTH, channel]
+                result_image[i: i + BLOCK_LENGTH, j: j + BLOCK_LENGTH,
                 channel] = decode_block(block)
+
     cv2.cvtColor(src=result_image, dst=result_image, code=INVERSE_IMAGE_FORMAT)
     return result_image
 

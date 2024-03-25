@@ -7,27 +7,18 @@ def encoder(image) -> np.ndarray:
                                 BLOCK_LENGTH - (temp_width % BLOCK_LENGTH), cv2.BORDER_REPLICATE)
     length, width = result.shape[:2]
     cv2.cvtColor(src=image, dst=image, code=IMAGE_FORMAT)
-
     result_image = np.empty((length, width, CHANNELS), dtype=INTEGER_DTYPE_SIGNED)
     for channel in range(CHANNELS):
-        for i in range(int(length / BLOCK_LENGTH) - 1):
-
-            block_row_start = i * BLOCK_LENGTH
-            block_row_end = i * BLOCK_LENGTH + BLOCK_LENGTH
-
-            for j in range(int(width / BLOCK_LENGTH) - 1):
-                block_column_start = j * BLOCK_LENGTH
-                block_column_end = j * BLOCK_LENGTH + BLOCK_LENGTH
-                if block_column_end == 1928:
-                    pass
-                block = image[block_row_start: block_row_end, block_column_start: block_column_end, channel]
-                result_image[block_row_start: block_row_end, block_column_start: block_column_end,
+        for i in range(0, length, BLOCK_LENGTH):
+            for j in range(0, width, BLOCK_LENGTH):
+                block = image[i: i + BLOCK_LENGTH, j: j + BLOCK_LENGTH, channel]
+                result_image[i: i + BLOCK_LENGTH, j: j + BLOCK_LENGTH,
                 channel] = encode_block(
                     block)
     return get_RLE(result_image, length, width)
 
 
-def encode_block(block)-> np.ndarray:
+def encode_block(block) -> np.ndarray:
     quantization_table = QUANTIZATION_TABLE
     processed_block = cv2.dct(np.asarray(block, dtype=FLOAT_DTYPE) / SCALE) * SCALE
     processed_block = np.divide(processed_block, quantization_table)
@@ -36,7 +27,7 @@ def encode_block(block)-> np.ndarray:
     return processed_block
 
 
-def zigzager(block)-> np.ndarray:
+def zigzager(block) -> np.ndarray:
     result = np.empty(shape=(BLOCK_LENGTH, BLOCK_LENGTH), dtype=INTEGER_DTYPE_SIGNED)
     phase = - 1
     i = 0
@@ -64,7 +55,7 @@ def zigzager(block)-> np.ndarray:
     return result
 
 
-def get_RLE(image, length, width)-> np.ndarray:
+def get_RLE(image, length, width) -> np.ndarray:
     counter = 1
     pos = 4
     # with open(file_name, "wb") as file:
