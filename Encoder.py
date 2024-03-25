@@ -1,7 +1,7 @@
 from utils import *
 
 
-def encoder(image):
+def encoder(image) -> np.ndarray:
     temp_length, temp_width = image.shape[:2]
     result = cv2.copyMakeBorder(image, 0, BLOCK_LENGTH - (temp_length % BLOCK_LENGTH), 0,
                                 BLOCK_LENGTH - (temp_width % BLOCK_LENGTH), cv2.BORDER_REPLICATE)
@@ -27,7 +27,7 @@ def encoder(image):
     return get_RLE(result_image, length, width)
 
 
-def encode_block(block):
+def encode_block(block)-> np.ndarray:
     quantization_table = QUANTIZATION_TABLE
     processed_block = cv2.dct(np.asarray(block, dtype=FLOAT_DTYPE) / SCALE) * SCALE
     processed_block = np.divide(processed_block, quantization_table)
@@ -36,7 +36,7 @@ def encode_block(block):
     return processed_block
 
 
-def zigzager(block):
+def zigzager(block)-> np.ndarray:
     result = np.empty(shape=(BLOCK_LENGTH, BLOCK_LENGTH), dtype=INTEGER_DTYPE_SIGNED)
     phase = - 1
     i = 0
@@ -64,7 +64,7 @@ def zigzager(block):
     return result
 
 
-def get_RLE(image, length, width):
+def get_RLE(image, length, width)-> np.ndarray:
     counter = 1
     pos = 4
     # with open(file_name, "wb") as file:

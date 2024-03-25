@@ -5,7 +5,7 @@ from utils import *
 import argparse
 
 
-def encode(image_path):
+def encode(image_path) -> None:
     encoded_file_name = os.path.splitext(image_path)[0] + '.ast'
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     encoded_image = Encoder.encoder(image)
@@ -17,7 +17,7 @@ def encode(image_path):
             f"compression process ended, new file size is {np.float16(100 * new_size / old_size)}% of the old file size")
 
 
-def decode(image_path):
+def decode(image_path) -> None:
     decoded_file_name = os.path.splitext(image_path)[0] + '.tsa'
     encoded_image = np.fromfile(image_path, dtype=INTEGER_DTYPE_UNSIGNED)
     decoded_image = Decoder.decoder(encoded_image)

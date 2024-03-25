@@ -1,7 +1,7 @@
 from utils import *
 
 
-def decoder(encoded_image):
+def decoder(encoded_image) -> np.ndarray:
     length = encoded_image[0] + encoded_image[1] * SECOND_BYTE_COEFFICIENT
     width = encoded_image[2] + encoded_image[3] * SECOND_BYTE_COEFFICIENT
 
@@ -25,7 +25,7 @@ def decoder(encoded_image):
     return result_image
 
 
-def decode_block(block):
+def decode_block(block) -> np.ndarray:
     quantization_table = QUANTIZATION_TABLE
     block = anti_zigzager(block)
     block = np.multiply(block, quantization_table)
@@ -35,7 +35,7 @@ def decode_block(block):
     return block
 
 
-def anti_RLE(image_data, length, width):
+def anti_RLE(image_data, length, width) -> np.ndarray:
     i = 0
     row = 0
     col = 0
@@ -54,7 +54,7 @@ def anti_RLE(image_data, length, width):
     return encoded_image
 
 
-def anti_zigzager(block):
+def anti_zigzager(block) -> np.ndarray:
     result = np.empty(shape=(BLOCK_LENGTH, BLOCK_LENGTH), dtype=INTEGER_DTYPE_SIGNED)
     phase = - 1
     i = 0

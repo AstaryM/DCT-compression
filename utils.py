@@ -27,7 +27,7 @@ IMAGE_FORMAT = cv2.COLOR_BGR2YCrCb
 INVERSE_IMAGE_FORMAT = cv2.COLOR_YCrCb2BGR
 
 
-def get_incremented_coords_3dim(row, col, channel, width, length):
+def get_incremented_coords_3dim(row, col, channel, width, length) -> tuple:
     channel = (channel + 1) % 3
     if channel == 0:
         col += 1
@@ -37,19 +37,19 @@ def get_incremented_coords_3dim(row, col, channel, width, length):
     return (row, col, channel)
 
 
-def get_incremented_coords_2dim(row, col, width):
+def get_incremented_coords_2dim(row, col, width) -> tuple:
     if col == width - 1:
         return row + 1, 0
     return row, col + 1
 
 
-def is_on_edge(index):
+def is_on_edge(index) -> bool:
     return index == 0 or index == BLOCK_LENGTH - 1
 
 
-def is_on_point(max_index, min_index):
+def is_on_point(max_index, min_index) -> bool:
     return max_index == BLOCK_LENGTH - 1 and min_index == 0
 
 
-def new_phase_values(phase, index):
+def new_phase_values(phase, index) -> tuple:
     return phase * -1, index + 1
